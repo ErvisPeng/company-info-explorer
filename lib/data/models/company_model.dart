@@ -1,3 +1,4 @@
+import 'package:company_info_explorer/core/utils/html_entity_decoder.dart';
 import 'package:company_info_explorer/core/utils/par_value_parser.dart';
 import 'package:company_info_explorer/domain/entities/company.dart';
 
@@ -23,27 +24,30 @@ class CompanyModel extends Company {
   });
 
   factory CompanyModel.fromJson(Map<String, dynamic> json) {
-    final parValueDesc = json['普通股每股面額'] as String? ?? '';
-    final websiteRaw = json['網址'] as String? ?? '';
+    String field(String key) =>
+        decodeHtmlEntities(json[key] as String? ?? '');
+
+    final parValueDesc = field('普通股每股面額');
+    final websiteRaw = field('網址');
 
     return CompanyModel(
-      stockCode: json['公司代號'] as String? ?? '',
-      name: json['公司名稱'] as String? ?? '',
-      shortName: json['公司簡稱'] as String? ?? '',
-      industryCode: json['產業別'] as String? ?? '',
-      chairman: json['董事長'] as String? ?? '',
-      generalManager: json['總經理'] as String? ?? '',
-      address: json['住址'] as String? ?? '',
-      phone: json['總機電話'] as String? ?? '',
-      taxId: json['營利事業統一編號'] as String? ?? '',
-      foundedDate: json['成立日期'] as String? ?? '',
-      listedDate: json['上市日期'] as String? ?? '',
+      stockCode: field('公司代號'),
+      name: field('公司名稱'),
+      shortName: field('公司簡稱'),
+      industryCode: field('產業別'),
+      chairman: field('董事長'),
+      generalManager: field('總經理'),
+      address: field('住址'),
+      phone: field('總機電話'),
+      taxId: field('營利事業統一編號'),
+      foundedDate: field('成立日期'),
+      listedDate: field('上市日期'),
       paidInCapital:
-          double.tryParse(json['實收資本額'] as String? ?? '0') ?? 0,
+          double.tryParse(field('實收資本額')) ?? 0,
       parValueDesc: parValueDesc,
       parValue: parseParValue(parValueDesc),
-      specialShares: int.tryParse(json['特別股'] as String? ?? '0') ?? 0,
-      privateShares: int.tryParse(json['私募股數'] as String? ?? '0') ?? 0,
+      specialShares: int.tryParse(field('特別股')) ?? 0,
+      privateShares: int.tryParse(field('私募股數')) ?? 0,
       website: (websiteRaw.isEmpty || websiteRaw == '－') ? null : websiteRaw,
     );
   }
