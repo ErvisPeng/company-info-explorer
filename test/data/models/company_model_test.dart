@@ -61,6 +61,12 @@ void main() {
       expect(model.website, isNull);
     });
 
+    test('should set website to null when "無" with trailing space', () {
+      jsonMap['網址'] = '無　';
+      final model = CompanyModel.fromJson(jsonMap);
+      expect(model.website, isNull);
+    });
+
     test('should parse special shares and private shares', () {
       final model = CompanyModel.fromJson(jsonMap);
       expect(model.specialShares, 0);

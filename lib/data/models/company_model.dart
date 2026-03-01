@@ -28,7 +28,9 @@ class CompanyModel extends Company {
         decodeHtmlEntities(json[key] as String? ?? '');
 
     final parValueDesc = field('普通股每股面額');
-    final websiteRaw = field('網址');
+    final websiteRaw = field('網址').trim();
+    final hasWebsite =
+        websiteRaw.isNotEmpty && websiteRaw != '－' && websiteRaw != '無';
 
     return CompanyModel(
       stockCode: field('公司代號'),
@@ -48,7 +50,7 @@ class CompanyModel extends Company {
       parValue: parseParValue(parValueDesc),
       specialShares: int.tryParse(field('特別股')) ?? 0,
       privateShares: int.tryParse(field('私募股數')) ?? 0,
-      website: (websiteRaw.isEmpty || websiteRaw == '－') ? null : websiteRaw,
+      website: hasWebsite ? websiteRaw : null,
     );
   }
 }
