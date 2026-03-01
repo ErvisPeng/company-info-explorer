@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  final _watchlistKey = GlobalKey<WatchlistPageState>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: [
           IndustryListPage(companies: widget.companies),
-          WatchlistPage(allCompanies: widget.companies),
+          WatchlistPage(key: _watchlistKey, allCompanies: widget.companies),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -31,6 +32,9 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             _currentIndex = index;
           });
+          if (index == 1) {
+            _watchlistKey.currentState?.refreshWatchlist();
+          }
         },
         items: const [
           BottomNavigationBarItem(

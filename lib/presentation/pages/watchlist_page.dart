@@ -14,15 +14,11 @@ class WatchlistPage extends StatefulWidget {
   const WatchlistPage({super.key, required this.allCompanies});
 
   @override
-  State<WatchlistPage> createState() => _WatchlistPageState();
+  State<WatchlistPage> createState() => WatchlistPageState();
 }
 
-class _WatchlistPageState extends State<WatchlistPage>
-    with AutomaticKeepAliveClientMixin {
+class WatchlistPageState extends State<WatchlistPage> {
   late final WatchlistBloc _watchlistBloc;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -37,7 +33,7 @@ class _WatchlistPageState extends State<WatchlistPage>
     super.dispose();
   }
 
-  void _refreshWatchlist() {
+  void refreshWatchlist() {
     _watchlistBloc.add(LoadWatchlist(widget.allCompanies));
   }
 
@@ -68,7 +64,6 @@ class _WatchlistPageState extends State<WatchlistPage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return BlocProvider.value(
       value: _watchlistBloc,
       child: Scaffold(
@@ -153,7 +148,7 @@ class _WatchlistPageState extends State<WatchlistPage>
                   ),
                 ),
               );
-              _refreshWatchlist();
+              refreshWatchlist();
             },
           ),
         );
