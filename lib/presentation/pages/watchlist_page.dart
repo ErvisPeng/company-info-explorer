@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:company_info_explorer/di/injection_container.dart' as di;
 import 'package:company_info_explorer/domain/entities/company.dart';
 import 'package:company_info_explorer/core/constants/industry_codes.dart';
 import 'package:company_info_explorer/presentation/blocs/watchlist/watchlist_bloc.dart';
@@ -8,34 +7,10 @@ import 'package:company_info_explorer/presentation/blocs/watchlist/watchlist_eve
 import 'package:company_info_explorer/presentation/blocs/watchlist/watchlist_state.dart';
 import 'package:company_info_explorer/presentation/pages/company_detail_page.dart';
 
-class WatchlistPage extends StatefulWidget {
+class WatchlistPage extends StatelessWidget {
   final List<Company> allCompanies;
 
   const WatchlistPage({super.key, required this.allCompanies});
-
-  @override
-  State<WatchlistPage> createState() => WatchlistPageState();
-}
-
-class WatchlistPageState extends State<WatchlistPage> {
-  late final WatchlistBloc _watchlistBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _watchlistBloc = di.sl<WatchlistBloc>();
-    _watchlistBloc.add(LoadWatchlist(widget.allCompanies));
-  }
-
-  @override
-  void dispose() {
-    _watchlistBloc.close();
-    super.dispose();
-  }
-
-  void refreshWatchlist() {
-    _watchlistBloc.add(LoadWatchlist(widget.allCompanies));
-  }
 
   Future<bool> _confirmRemove(
     BuildContext context,
@@ -64,45 +39,50 @@ class WatchlistPageState extends State<WatchlistPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _watchlistBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            '追蹤',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '追蹤',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        body: BlocBuilder<WatchlistBloc, WatchlistState>(
-          builder: (context, state) {
-            if (state is WatchlistLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is WatchlistLoaded) {
-              if (state.companies.isEmpty) {
-                return const Center(
-                  child: Text(
-                    '尚無追蹤的公司',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+      ),
+      body: BlocBuilder<WatchlistBloc, WatchlistState>(
+        builder: (context, state) {
+          if (state is WatchlistLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is WatchlistError) {
+            return Center(
+              child: Text(
+                state.message,
+                style: const TextStyle(fontSize: 16, color: Colors.red),
+              ),
+            );
+          }
+          if (state is WatchlistLoaded) {
+            if (state.companies.isEmpty) {
+              return const Center(
+                child: Text(
+                  '尚無追蹤的公司',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
                   ),
-                );
-              }
-              return _buildWatchlist(state.companies);
+                ),
+              );
             }
-            return const SizedBox.shrink();
-          },
-        ),
+            return _buildWatchlist(context, state.companies);
+          }
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
 
-  Widget _buildWatchlist(List<Company> companies) {
+  Widget _buildWatchlist(BuildContext context, List<Company> companies) {
     return ListView.separated(
       itemCount: companies.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
+      separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final company = companies[index];
         return Dismissible(
@@ -123,12 +103,12 @@ class WatchlistPageState extends State<WatchlistPage> {
           ),
           confirmDismiss: (_) => _confirmRemove(context, company),
           onDismissed: (_) {
-            _watchlistBloc.add(
-              RemoveFromWatchlistEvent(
-                company.stockCode,
-                widget.allCompanies,
-              ),
-            );
+            context.read<WatchlistBloc>().add(
+                  RemoveFromWatchlistEvent(
+                    company.stockCode,
+                    allCompanies,
+                  ),
+                );
           },
           child: ListTile(
             title: Text(
@@ -144,11 +124,15 @@ class WatchlistPageState extends State<WatchlistPage> {
                   builder: (_) => CompanyDetailPage(
                     company: company,
                     industryName: industryName,
-                    allCompanies: widget.allCompanies,
+                    allCompanies: allCompanies,
                   ),
                 ),
               );
-              refreshWatchlist();
+              if (context.mounted) {
+                context
+                    .read<WatchlistBloc>()
+                    .add(LoadWatchlist(allCompanies));
+              }
             },
           ),
         );

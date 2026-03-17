@@ -17,3 +17,10 @@ class WatchlistLoaded extends WatchlistState {
   @override
   List<Object> get props => [companies];
 }
+
+class WatchlistError extends WatchlistState {
+  final String message;
+  const WatchlistError(this.message);
+  @override
+  List<Object> get props => [message];
+}
