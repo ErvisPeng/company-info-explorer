@@ -26,11 +26,23 @@ class IndustryListPage extends StatefulWidget {
 class _IndustryListPageState extends State<IndustryListPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
+  late final IndustryListBloc _industryListBloc;
+  late final StockSearchBloc _stockSearchBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _industryListBloc = di.sl<IndustryListBloc>()
+      ..add(LoadIndustries(widget.companies));
+    _stockSearchBloc = di.sl<StockSearchBloc>();
+  }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
+    _industryListBloc.close();
+    _stockSearchBloc.close();
     super.dispose();
   }
 
@@ -38,13 +50,8 @@ class _IndustryListPageState extends State<IndustryListPage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => di.sl<IndustryListBloc>()
-            ..add(LoadIndustries(widget.companies)),
-        ),
-        BlocProvider(
-          create: (_) => di.sl<StockSearchBloc>(),
-        ),
+        BlocProvider.value(value: _industryListBloc),
+        BlocProvider.value(value: _stockSearchBloc),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -79,14 +86,14 @@ class _IndustryListPageState extends State<IndustryListPage> {
           prefixIcon: const Icon(Icons.search),
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _searchController,
-            builder: (context, value, _) {
+            builder: (suffixContext, value, _) {
               return value.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         _searchController.clear();
-                        context.read<StockSearchBloc>().add(const ClearSearch());
-                        FocusScope.of(context).unfocus();
+                        _stockSearchBloc.add(const ClearSearch());
+                        FocusScope.of(suffixContext).unfocus();
                       },
                     )
                   : const SizedBox.shrink();
@@ -97,17 +104,14 @@ class _IndustryListPageState extends State<IndustryListPage> {
         onChanged: (value) {
           _debounceTimer?.cancel();
           if (value.isEmpty) {
-            context
-                .read<StockSearchBloc>()
-                .add(const ClearSearch());
+            _stockSearchBloc.add(const ClearSearch());
             return;
           }
           _debounceTimer = Timer(
             const Duration(milliseconds: 300),
             () {
               if (!mounted) return;
-              context
-                  .read<StockSearchBloc>()
+              _stockSearchBloc
                   .add(SearchStocks(value, widget.companies));
             },
           );
