@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:company_info_explorer/di/injection_container.dart' as di;
 import 'package:company_info_explorer/domain/entities/company.dart';
 import 'package:company_info_explorer/core/utils/number_formatter.dart';
 import 'package:company_info_explorer/core/utils/par_value_parser.dart';
+import 'package:company_info_explorer/core/utils/date_formatter.dart';
+import 'package:company_info_explorer/core/utils/url_launcher_helper.dart';
 import 'package:company_info_explorer/presentation/blocs/company_detail/company_detail_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/company_detail/company_detail_event.dart';
 import 'package:company_info_explorer/presentation/blocs/company_detail/company_detail_state.dart';
@@ -20,22 +21,6 @@ class CompanyDetailPage extends StatelessWidget {
     required this.industryName,
     required this.allCompanies,
   });
-
-  String _formatDate(String raw) {
-    if (raw.length != 8) return raw;
-    return '${raw.substring(0, 4)}/${raw.substring(4, 6)}/${raw.substring(6, 8)}';
-  }
-
-  Future<void> _openWebsite(String url) async {
-    String target = url;
-    if (!target.startsWith('http://') && !target.startsWith('https://')) {
-      target = 'https://$target';
-    }
-    final uri = Uri.parse(target);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
 
   void _showWatchlistDialog(
     BuildContext context,
@@ -147,7 +132,7 @@ class CompanyDetailPage extends StatelessWidget {
             if (company.website != null && company.website!.isNotEmpty)
               IconButton(
                 icon: const Icon(Icons.language, color: Colors.blue),
-                onPressed: () => _openWebsite(company.website!),
+                onPressed: () => openWebsite(company.website!),
                 tooltip: '開啟公司網站',
               ),
           ],
@@ -158,8 +143,8 @@ class CompanyDetailPage extends StatelessWidget {
         _buildInfoRow('總經理', company.generalManager),
         _buildInfoRow('產業類別', industryName),
         const Divider(),
-        _buildInfoRow('成立日期', _formatDate(company.foundedDate)),
-        _buildInfoRow('上市日期', _formatDate(company.listedDate)),
+        _buildInfoRow('成立日期', formatDate(company.foundedDate)),
+        _buildInfoRow('上市日期', formatDate(company.listedDate)),
         const Divider(),
         _buildInfoRow('電話', company.phone),
         _buildInfoRow('統一編號', company.taxId),
@@ -175,10 +160,11 @@ class CompanyDetailPage extends StatelessWidget {
           '${formatWithCommas(issuedShares)} 股'
           '（含私募 ${formatWithCommas(company.privateShares)} 股）',
         ),
-        _buildInfoRow(
-          '特別股',
-          '${formatWithCommas(company.specialShares)} 股',
-        ),
+        if (company.specialShares > 0)
+          _buildInfoRow(
+            '特別股',
+            '${formatWithCommas(company.specialShares)} 股',
+          ),
       ],
     );
   }

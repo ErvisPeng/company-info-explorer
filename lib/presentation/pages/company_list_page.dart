@@ -48,7 +48,7 @@ class CompanyListPage extends StatelessWidget {
                   if (state is CompanyListLoaded) {
                     return ListView.separated(
                       itemCount: state.companies.length,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      separatorBuilder: (_, __) => const Divider(height: 1),
                       itemBuilder: (context, index) {
                         final company = state.companies[index];
                         return ListTile(

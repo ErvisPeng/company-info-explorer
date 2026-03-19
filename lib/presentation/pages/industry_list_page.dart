@@ -29,7 +29,7 @@ class IndustryListPage extends StatelessWidget {
             if (state is IndustryListLoaded) {
               return ListView.separated(
                 itemCount: state.industries.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
+                separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final industry = state.industries[index];
                   return ListTile(

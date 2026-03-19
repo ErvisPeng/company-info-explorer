@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:company_info_explorer/core/error/failures.dart';
 import 'package:company_info_explorer/domain/usecases/load_companies_usecase.dart';
 import 'package:company_info_explorer/presentation/blocs/app/app_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/app/app_event.dart';
@@ -30,13 +31,35 @@ void main() {
     );
 
     blocTest<AppBloc, AppState>(
-      'emits [AppLoading, AppError] when AppStarted fails',
+      'emits [AppLoading, AppError] when AppStarted fails with Failure',
+      build: () {
+        when(() => mockUseCase())
+            .thenThrow(const ServerFailure('伺服器錯誤'));
+        return AppBloc(loadCompanies: mockUseCase);
+      },
+      act: (bloc) => bloc.add(AppStarted()),
+      expect: () => [
+        isA<AppLoading>(),
+        isA<AppError>()
+            .having((s) => s.message, 'message', '伺服器錯誤'),
+      ],
+    );
+
+    blocTest<AppBloc, AppState>(
+      'emits [AppLoading, AppError] when AppStarted fails with unexpected error',
       build: () {
         when(() => mockUseCase()).thenThrow(Exception('Network error'));
         return AppBloc(loadCompanies: mockUseCase);
       },
       act: (bloc) => bloc.add(AppStarted()),
-      expect: () => [isA<AppLoading>(), isA<AppError>()],
+      expect: () => [
+        isA<AppLoading>(),
+        isA<AppError>().having(
+          (s) => s.message,
+          'message',
+          contains('未預期'),
+        ),
+      ],
     );
   });
 }

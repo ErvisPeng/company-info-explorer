@@ -14,3 +14,10 @@ class CompanyDetailLoaded extends CompanyDetailState {
   @override
   List<Object> get props => [isWatched];
 }
+
+class CompanyDetailError extends CompanyDetailState {
+  final String message;
+  const CompanyDetailError(this.message);
+  @override
+  List<Object> get props => [message];
+}
