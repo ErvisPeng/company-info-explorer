@@ -75,8 +75,10 @@ lib/
 │   ├── error/
 │   │   └── failures.dart              # 自定義 Exception
 │   └── utils/
+│       ├── date_formatter.dart         # 日期格式化
 │       ├── number_formatter.dart       # 千分位格式化
-│       └── par_value_parser.dart       # 面額字串解析
+│       ├── par_value_parser.dart       # 面額字串解析
+│       └── url_launcher_helper.dart    # 開啟外部網址
 ├── domain/                            # 領域層（純 Dart）
 │   ├── entities/
 │   │   ├── company.dart
@@ -152,15 +154,16 @@ flutter test
 
 ### 測試涵蓋範圍
 
-共 **51 個測試**，涵蓋 4 個層級：
+共 **73 個測試**，涵蓋 5 個層級：
 
 | 層級 | 測試檔案 | 測試內容 |
 |------|---------|---------|
-| Core Utils | `number_formatter_test.dart`, `par_value_parser_test.dart` | 千分位格式化、面額字串解析 |
+| Core Utils | `number_formatter_test.dart`, `par_value_parser_test.dart`, `date_formatter_test.dart` | 千分位格式化、面額字串解析、日期格式化 |
 | Data — Model | `company_model_test.dart` | TWSE API JSON 解析，含各欄位與邊界情境 |
 | Data — Repository | `company_repository_impl_test.dart` | 遠端資料載入、內存快取、追蹤列表 CRUD |
 | Domain — UseCase | `get_industries_usecase_test.dart`, `get_watchlist_usecase_test.dart`, `toggle_watchlist_usecase_test.dart` | 產業分組邏輯、追蹤列表查詢與增刪 |
-| Presentation — BLoC | `app_bloc_test.dart`, `industry_list_bloc_test.dart`, `watchlist_bloc_test.dart` | 各 BLoC 狀態流轉正確性 |
+| Presentation — BLoC | `app_bloc_test.dart`, `industry_list_bloc_test.dart`, `company_list_bloc_test.dart`, `company_detail_bloc_test.dart`, `watchlist_bloc_test.dart` | 各 BLoC 狀態流轉正確性 |
+| Presentation — Widget | `company_detail_page_test.dart` | 公司詳情頁面渲染與互動驗證 |
 
 每一層的測試皆透過 `mocktail` mock 掉下層依賴，確保單元測試的隔離性。
 
@@ -200,7 +203,6 @@ feat: 實作追蹤列表頁面（含左滑移除）
 | **離線快取** | 將 API 資料快取至本機（`sqflite` 或 `hive`），支援離線瀏覽 |
 | **搜尋功能** | 新增公司名稱 / 代號的即時搜尋功能 |
 | **分頁載入** | 當資料量增大時，實作 lazy loading 或 pagination |
-| **Widget Tests** | 補充 UI 元件的 Widget Test，驗證畫面渲染正確性 |
 | **Integration Tests** | 端對端整合測試，驗證完整使用者操作流程 |
 | **CI/CD** | 設定 GitHub Actions 自動執行測試與靜態分析 |
 | **主題切換** | 支援 Dark Mode 與動態主題切換 |
