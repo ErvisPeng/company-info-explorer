@@ -11,8 +11,10 @@ import 'package:company_info_explorer/domain/usecases/get_companies_by_industry_
 import 'package:company_info_explorer/domain/usecases/get_watchlist_usecase.dart';
 import 'package:company_info_explorer/domain/usecases/add_to_watchlist_usecase.dart';
 import 'package:company_info_explorer/domain/usecases/remove_from_watchlist_usecase.dart';
+import 'package:company_info_explorer/domain/usecases/search_companies_usecase.dart';
 import 'package:company_info_explorer/presentation/blocs/app/app_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/industry_list/industry_list_bloc.dart';
+import 'package:company_info_explorer/presentation/blocs/stock_search/stock_search_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/company_list/company_list_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/company_detail/company_detail_bloc.dart';
 import 'package:company_info_explorer/presentation/blocs/watchlist/watchlist_bloc.dart';
@@ -44,9 +46,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetWatchlistUseCase(sl()));
   sl.registerLazySingleton(() => AddToWatchlistUseCase(sl()));
   sl.registerLazySingleton(() => RemoveFromWatchlistUseCase(sl()));
+  sl.registerLazySingleton(() => SearchCompaniesUseCase());
 
   // BLoCs
   sl.registerFactory(() => AppBloc(loadCompanies: sl()));
+  sl.registerFactory(() => StockSearchBloc(searchCompanies: sl()));
   sl.registerFactory(() => IndustryListBloc(getIndustries: sl()));
   sl.registerFactory(() => CompanyListBloc(getCompaniesByIndustry: sl()));
   sl.registerFactory(
