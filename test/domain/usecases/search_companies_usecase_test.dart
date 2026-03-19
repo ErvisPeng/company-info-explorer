@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:company_info_explorer/domain/entities/company.dart';
 import 'package:company_info_explorer/domain/usecases/search_companies_usecase.dart';
 
 import '../../helpers/test_data.dart';

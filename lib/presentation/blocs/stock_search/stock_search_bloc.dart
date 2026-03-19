@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:company_info_explorer/domain/usecases/search_companies_usecase.dart';
-import 'stock_search_event.dart';
-import 'stock_search_state.dart';
+import 'package:company_info_explorer/presentation/blocs/stock_search/stock_search_event.dart';
+import 'package:company_info_explorer/presentation/blocs/stock_search/stock_search_state.dart';
 
 class StockSearchBloc extends Bloc<StockSearchEvent, StockSearchState> {
   final SearchCompaniesUseCase searchCompanies;

@@ -28,11 +28,6 @@ class _IndustryListPageState extends State<IndustryListPage> {
   Timer? _debounceTimer;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
@@ -149,8 +144,9 @@ class _IndustryListPageState extends State<IndustryListPage> {
       builder: (context, state) {
         if (state is IndustryListLoaded) {
           return ListView.separated(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: state.industries.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final industry = state.industries[index];
               return ListTile(
@@ -186,7 +182,7 @@ class _IndustryListPageState extends State<IndustryListPage> {
     return ListView.separated(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       itemCount: results.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final company = results[index];
         return ListTile(
